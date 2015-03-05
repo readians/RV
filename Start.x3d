@@ -15,9 +15,9 @@
 		            groundColor='0.1 0.1 0.0, 0.4 0.25 0.2, 0.6 0.6 0.6'
 		/>
 	    <TimeSensor DEF='Clock'
-					enabled='true'
 					loop = 'true'
 		/>
+	
 			
 		<Transform DEF="Drone_TRANSFORM">			
 			<Inline url='"drone.x3d"'/>
@@ -34,17 +34,23 @@
 		
 		<KeySensor DEF='KeyDetector'/>
 
-		<Script DEF = 'Mover' url='"keySensor.js"'>
-		<field accessType = 'inputOnly' name = 'keyPress' type='SFInt32'/>
-		<field accessType = 'initializeOnly' name = 'position_x'  type = 'SFFloat' value='0'/>
-		<field accessType = 'initializeOnly' name = 'position_y'  type = 'SFFloat' value='0'/>
-		<field accessType = 'initializeOnly' name = 'dx'  type = 'SFFloat'/>
-		<field accessType = 'initializeOnly' name = 'dy'  type = 'SFFloat'/>
-		<field accessType = 'outputOnly' name = 'value_changed' type = 'SFVec3f' />
+		<Script DEF= 'Mover' url='move.js'>
+		<field accessType = 'inputOnly'  		name = 'move_fraction'  type = 'SFFloat' />
+		<field accessType = 'inputOnly'  		name = 'move_key'  		type = 'SFInt32' />
+		<field accessType = 'initializeOnly' 	name = 'dx' 			type = 'SFFloat' value = '0' />
+		<field accessType = 'initializeOnly' 	name = 'dy' 			type = 'SFFloat' value = '0' />
+		<field accessType = 'initializeOnly' 	name = 'rot' 			type = 'SFFloat' value = '0' />
+		<field accessType = 'outputOnly' 		name = 'pos_changed' 	type = 'SFVec3f' />
+		<field accessType = 'outputOnly'		name = 'inc_changed'	type = 'SFRotation' />
 		</Script> 
-		
-		<ROUTE fromField='actionKeyPress' fromNode='KeyDetector' toField='keyPress' toNode='Mover'/>
-		<ROUTE fromField='value_changed' fromNode='Mover' toField='set_translation' toNode='Drone_TRANSFORM'/>
-					
+
+		<ROUTE  fromNode='KeyDetector'    fromField='actionKeyPress'
+				toNode='Mover'      toField='move_key'/>
+		<ROUTE  fromNode='Clock'    fromField='fraction_changed'
+				toNode='Mover'      toField='move_fraction'/>
+		<ROUTE  fromNode='Mover'    	 fromField='pos_changed'
+				toNode='Drone_TRANSFORM' toField='set_translation'/>
+		<ROUTE  fromNode='Mover'    	 fromField='inc_changed'
+				toNode='Drone_TRANSFORM' toField='set_rotation'/>
 	</Scene>
 </X3D>
